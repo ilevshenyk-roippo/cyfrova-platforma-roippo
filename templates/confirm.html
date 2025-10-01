@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Підтвердження email</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="container">
+      <div class="hero">
+        <h2>Електронну пошту підтверджено</h2>
+        <p class="muted">Тепер можете увійти до Цифрової платформи РОІППО.</p>
+        <div class="cta">
+          <a href="{{ url_for('login') }}" class="btn btn-primary">Перейти до входу</a>
+          <a href="{{ url_for('index') }}" class="btn btn-outline">На головну</a>
+        </div>
+      </div>
+    </main>
+  </body>
+  </html>
+
+

@@ -4,8 +4,33 @@ body{margin:0;background:linear-gradient(180deg,#f6faff, #eef6ff);color:var(--te
 .container{max-width:960px;margin:48px auto;padding:0 20px}
 h1{margin:0 0 8px;font-size:32px}
 h2{margin:0 0 16px;font-size:22px}
+
+/* Навігація */
+.navbar-wrap{position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.7);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.navbar{max-width:960px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.logo-badge{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#93c5fd,#60a5fa);box-shadow:var(--shadow)}
+.logo-text{font-weight:800;color:var(--primary);display:none}
+.nav{display:flex;align-items:center;gap:16px}
+.nav-links{display:flex;gap:8px}
+.nav-link{display:inline-block;padding:8px 12px;border-radius:10px;text-decoration:none;color:var(--text);border:1px solid transparent}
+.nav-link:hover{background:var(--primary-100);border-color:var(--primary-200)}
+.nav-link.active{background:#fff;border:1px solid var(--primary-200);box-shadow:var(--shadow)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-auth a{padding:8px 12px;border-radius:10px;text-decoration:none}
+.nav-auth .login{background:var(--primary);color:#fff;box-shadow:var(--shadow)}
+.nav-auth .register{background:#fff;color:var(--primary);border:1px solid var(--primary-200)}
 .auth-bar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px;padding:10px 12px;background:var(--primary-100);border:1px solid var(--primary-200);border-radius:10px}
 .inline-form{margin:0}
+.account{position:relative}
+.avatar{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--primary);color:#fff;font-weight:700;box-shadow:var(--shadow);cursor:pointer}
+.account-menu{position:absolute;right:0;top:44px;min-width:240px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:8px;display:none}
+.account.open .account-menu{display:block}
+.account-row{padding:8px 10px;border-radius:8px;color:var(--text);text-decoration:none;display:block}
+.account-row:hover{background:var(--primary-100)}
+.account-row.muted{color:var(--muted)}
+.linklike{background:none;border:none;padding:8px 10px;width:100%;text-align:left;color:#dc2626;cursor:pointer;border-radius:8px}
+.linklike:hover{background:#fee2e2}
 .btn{display:inline-block;padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:600}
 .btn-primary{background:var(--primary);color:#fff;box-shadow:var(--shadow)}
 .btn-primary:hover{filter:brightness(1.05)}

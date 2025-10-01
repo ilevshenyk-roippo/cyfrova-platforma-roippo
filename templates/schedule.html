@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Електронний розклад — Цифрова платформа РОІППО</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <div class="navbar-wrap">
+      <nav class="navbar">
+        <div class="nav">
+          <a class="logo" href="{{ url_for('index') }}" aria-label="Логотип">
+            <span class="logo-badge" aria-hidden="true"></span>
+            <span class="logo-text">РОІППО</span>
+          </a>
+          <div class="nav-links">
+            <a class="nav-link" href="{{ url_for('index') }}">Бронювання аудиторій</a>
+            <a class="nav-link active" href="{{ url_for('schedule') }}">Електронний розклад</a>
+          </div>
+        </div>
+        <div class="nav-right">
+          {% if logged_in %}
+            <div class="account" id="accountWidget">
+              <button class="avatar" id="accountTrigger" aria-label="Меню акаунта" type="button">{{ (user.email or 'U')[:1] | upper }}</button>
+              <div class="account-menu" id="accountMenu">
+                <div class="account-row"><strong>{{ user.email }}</strong></div>
+                <div class="account-row muted">{{ user.first_name or '' }} {{ user.last_name or '' }}</div>
+                <hr>
+                <a href="{{ url_for('profile') }}" class="account-row">Профіль</a>
+                <a href="{{ url_for('settings') }}" class="account-row">Налаштування</a>
+                <form action="{{ url_for('logout') }}" method="post" class="account-row" style="margin:0;padding:0;">
+                  <button type="submit" class="linklike">Вийти</button>
+                </form>
+              </div>
+            </div>
+          {% else %}
+            <div class="nav-auth">
+              <a class="login" href="{{ url_for('login') }}">Увійти</a>
+              <a class="register" href="{{ url_for('register') }}">Зареєструватись</a>
+            </div>
+          {% endif %}
+        </div>
+      </nav>
+    </div>
+
+    <main class="container">
+      <h1>Електронний розклад</h1>
+      <section class="hero">
+        <h2>Модуль у розробці</h2>
+        <p class="muted">Скоро тут з’явиться зручний перегляд та керування розкладом.</p>
+      </section>
+    </main>
+  </body>
+  <script>
+    (function(){
+      const widget = document.getElementById('accountWidget');
+      const trigger = document.getElementById('accountTrigger');
+      const menu = document.getElementById('accountMenu');
+      if(!widget || !trigger || !menu) return;
+      function close(){ widget.classList.remove('open'); }
+      function open(){ widget.classList.add('open'); }
+      trigger.addEventListener('click', function(e){
+        e.stopPropagation();
+        if(widget.classList.contains('open')){ close(); } else { open(); }
+      });
+      document.addEventListener('click', function(){ close(); });
+      menu.addEventListener('click', function(e){ e.stopPropagation(); });
+    })();
+  </script>
+  </html>
+
+
