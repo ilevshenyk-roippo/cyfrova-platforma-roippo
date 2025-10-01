@@ -1,18 +1,29 @@
+# app.py
 import os
 import streamlit as st
 import requests
 import json
+from dotenv import load_dotenv
+
+# Завантажуємо змінні середовища (.env для локального запуску)
+load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+print(os.getenv("SUPABASE_URL"))
+print(os.getenv("SUPABASE_KEY"))
 
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise ValueError("SUPABASE_URL або SUPABASE_KEY не задані. Перевірте .env або Environment Variables.")
+
+# Заголовки для REST API
 headers = {
     "apikey": SUPABASE_KEY,
     "Authorization": f"Bearer {SUPABASE_KEY}",
     "Content-Type": "application/json"
 }
 
-st.title("Бронювання аудиторій (через REST API)")
+st.title("Бронювання аудиторій")
 
 # Форма для бронювання
 with st.form("reservation_form"):
