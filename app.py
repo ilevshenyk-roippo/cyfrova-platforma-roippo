@@ -140,7 +140,7 @@ def reserve():
         return redirect(url_for("index"))
 
     if not auditoriya or not date_str:
-        flash("Будь ласка, заповніть номер аудиторії і дату.", "error")
+        flash("Будь ласка, заповніть номер авдиторії і дату.", "error")
         return redirect(url_for("index"))
 
     try:
@@ -303,7 +303,7 @@ def profile():
             "Content-Type": "application/json",
         }
         payload = {"data": {"first_name": first_name, "last_name": last_name}}
-        resp = requests.patch(url, headers=headers, data=json.dumps(payload), timeout=20)
+        resp = requests.put(url, headers=headers, data=json.dumps(payload), timeout=20)
         if resp.status_code in (200, 201):
             # Оновлюємо локальну сесію теж
             user = current_user()
@@ -311,7 +311,7 @@ def profile():
             session["user"] = user
             flash("Профіль оновлено.", "success")
         else:
-            flash(f"Не вдалося оновити профіль: {resp.text}", "error")
+            flash(f"Не вдалося оновити профіль (HTTP {resp.status_code}): {resp.text}", "error")
     except requests.RequestException as exc:
         flash(f"Помилка з'єднання: {exc}", "error")
 
@@ -343,8 +343,12 @@ def change_password():
     if not require_login():
         return redirect(url_for("index"))
 
+    old_password = request.form.get("old_password", "").strip()
     new_password = request.form.get("new_password", "").strip()
     confirm_new_password = request.form.get("confirm_new_password", "").strip()
+    if not old_password:
+        flash("Вкажіть старий пароль.", "error")
+        return redirect(url_for("profile"))
     if not new_password or not confirm_new_password:
         flash("Вкажіть новий пароль і підтвердження.", "error")
         return redirect(url_for("profile"))
@@ -361,6 +365,23 @@ def change_password():
         return redirect(url_for("login"))
 
     try:
+        # 1) Перевірка старого пароля через логін
+        user_email = (current_user() or {}).get("email")
+        if not user_email:
+            flash("Немає email у сесії. Увійдіть знову.", "error")
+            return redirect(url_for("login"))
+        verify_url = f"{get_auth_url()}/token?grant_type=password"
+        verify_headers = {
+            "apikey": os.getenv("SUPABASE_KEY", ""),
+            "Content-Type": "application/json",
+        }
+        verify_payload = {"email": user_email, "password": old_password}
+        verify_resp = requests.post(verify_url, headers=verify_headers, data=json.dumps(verify_payload), timeout=20)
+        if verify_resp.status_code != 200:
+            flash("Старий пароль невірний.", "error")
+            return redirect(url_for("profile"))
+
+        # 2) Оновлення пароля
         url = f"{get_auth_url()}/user"
         headers = {
             "Authorization": f"Bearer {access_token}",
@@ -368,10 +389,10 @@ def change_password():
             "Content-Type": "application/json",
         }
         payload = {"password": new_password}
-        resp = requests.patch(url, headers=headers, data=json.dumps(payload), timeout=20)
+        resp = requests.put(url, headers=headers, data=json.dumps(payload), timeout=20)
         if resp.status_code in (200, 201):
             flash("Пароль оновлено.", "success")
-        else:
+        if resp.status_code not in (200, 201):
             flash(f"Не вдалося змінити пароль: {resp.text}", "error")
     except requests.RequestException as exc:
         flash(f"Помилка з'єднання: {exc}", "error")
@@ -407,13 +428,22 @@ def delete_account():
             session.clear()
             flash("Акаунт видалено.", "success")
             return redirect(url_for("index"))
-        else:
+        if resp.status_code not in (200, 204):
             flash(f"Не вдалося видалити акаунт: {resp.text}", "error")
             return redirect(url_for("profile"))
     except requests.RequestException as exc:
         flash(f"Помилка з'єднання: {exc}", "error")
         return redirect(url_for("profile"))
 
+
+@app.route("/home", methods=["GET"])  # Головна сторінка платформи
+def home():
+    return render_template("home.html", logged_in=is_logged_in(), user=current_user())
+
+
+@app.route("/rooms-status", methods=["GET"])  # Стан авдиторій (заглушка)
+def rooms_status():
+    return render_template("rooms_status.html", logged_in=is_logged_in(), user=current_user())
 
 if __name__ == "__main__":
     # Локальний запуск

@@ -16,7 +16,7 @@
               <span class="logo-text">РОІППО</span>
             </a>
             <div class="nav-links">
-              <a class="nav-link active" href="{{ url_for('index') }}">Бронювання аудиторій</a>
+            <a class="nav-link active" href="{{ url_for('index') }}">Бронювання авдиторій</a>
               <a class="nav-link" href="{{ url_for('schedule') }}">Електронний розклад</a>
             </div>
           </div>
@@ -69,7 +69,7 @@
         <section class="form-section">
           <form action="{{ url_for('reserve') }}" method="post" class="form">
             <div class="form-row">
-              <label for="auditoriya">Номер аудиторії</label>
+              <label for="auditoriya">Номер авдиторії</label>
               <input id="auditoriya" name="auditoriya" type="text" required>
             </div>
             <div class="form-row">
@@ -88,7 +88,7 @@
             <ul class="reservations">
               {% for r in reservations %}
                 <li>
-                  <span>Аудиторія: <strong>{{ r["auditoriya"] }}</strong></span>
+                  <span>Авдиторія: <strong>{{ r["auditoriya"] }}</strong></span>
                   <span>Дата: <strong>{{ r["date"] }}</strong></span>
                 </li>
               {% endfor %}

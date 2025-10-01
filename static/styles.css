@@ -42,8 +42,32 @@ h2{margin:0 0 16px;font-size:22px}
 .cta{display:flex;justify-content:center;gap:12px;margin-top:12px}
 .form-section,.list-section{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
 .form-row{display:flex;flex-direction:column;margin-bottom:12px}
+/* Грід для форм (2 колонки на великих екранах) */
+.form-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width: 720px){.form-grid{grid-template-columns:1fr 1fr}}
 label{font-size:14px;color:var(--muted);margin-bottom:6px}
 input{height:42px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text);padding:0 12px}
+select{height:42px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text);padding:0 12px}
+input:disabled{background:#f1f5f9;color:#94a3b8}
+.input-wrap{position:relative}
+.input-wrap input{width:100%;padding-right:44px}
+.input-edit{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#ffffff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);box-shadow:var(--shadow);z-index:1}
+.input-edit:hover{background:var(--primary-100);color:var(--primary)}
+.input-edit svg{width:16px;height:16px}
+
+/* Карточки/секції */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px;font-size:18px}
+.section-sub{color:var(--muted);margin:0 0 12px}
+.row-inline{display:flex;gap:12px;align-items:center}
+
+/* Тумблер */
+.switch{position:relative;display:inline-block;width:46px;height:26px}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#cbd5e1;border:1px solid var(--border);transition:.2s;border-radius:999px}
+.slider:before{position:absolute;content:"";height:20px;width:20px;left:3px;top:2px;background:white;border-radius:999px;transition:.2s;box-shadow:var(--shadow)}
+.switch input:checked + .slider{background:#93c5fd;border-color:#60a5fa}
+.switch input:checked + .slider:before{transform:translateX(20px)}
 .form-actions{display:flex;justify-content:flex-end}
 button{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
 button:hover{filter:brightness(1.05)}

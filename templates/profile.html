@@ -50,42 +50,55 @@
         {% endif %}
       {% endwith %}
 
-      <section class="form-section">
-        <form action="{{ url_for('profile') }}" method="post" class="form">
-          <div class="form-row">
-            <label for="first_name">Ім’я</label>
-            <input id="first_name" name="first_name" type="text" value="{{ user.first_name or '' }}" required>
+      <section class="card">
+        <div class="section-title">Дані профілю</div>
+        <form action="{{ url_for('profile') }}" method="post" class="form" id="profileForm">
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="first_name">Ім’я</label>
+              <input id="first_name" name="first_name" type="text" value="{{ user.first_name or '' }}" required disabled>
+            </div>
+            <div class="form-row">
+              <label for="last_name">Прізвище</label>
+              <input id="last_name" name="last_name" type="text" value="{{ user.last_name or '' }}" required disabled>
+            </div>
           </div>
-          <div class="form-row">
-            <label for="last_name">Прізвище</label>
-            <input id="last_name" name="last_name" type="text" value="{{ user.last_name or '' }}" required>
-          </div>
-          <div class="form-actions">
-            <button type="submit">Зберегти</button>
-          </div>
-        </form>
-      </section>
-
-      <section class="list-section">
-        <h2>Зміна паролю</h2>
-        <form action="{{ url_for('change_password') }}" method="post" class="form">
-          <div class="form-row">
-            <label for="new_password">Новий пароль</label>
-            <input id="new_password" name="new_password" type="password" required>
-          </div>
-          <div class="form-row">
-            <label for="confirm_new_password">Підтвердження нового паролю</label>
-            <input id="confirm_new_password" name="confirm_new_password" type="password" required>
-          </div>
-          <div class="form-actions">
-            <button type="submit">Оновити пароль</button>
+          <div class="row-inline" style="justify-content:flex-end" id="actionRow">
+            <button type="button" class="btn btn-secondary" id="editBtn">Редагувати</button>
+            <button type="button" class="btn btn-outline" id="cancelBtn" style="display:none">Скасувати</button>
+            <button type="submit" id="saveBtn" style="display:none">Зберегти</button>
           </div>
         </form>
       </section>
 
-      <section class="list-section">
-        <h2>Видалення акаунта</h2>
-        <p class="muted">Цю дію неможливо скасувати. Для підтвердження введіть <strong>DELETE</strong> і натисніть кнопку нижче.</p>
+      <section class="card">
+        <div class="section-title">Зміна паролю</div>
+        <form action="{{ url_for('change_password') }}" method="post" class="form" id="passwordForm">
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="old_password">Старий пароль</label>
+              <input id="old_password" name="old_password" type="password" required disabled>
+            </div>
+            <div class="form-row">
+              <label for="new_password">Новий пароль</label>
+              <input id="new_password" name="new_password" type="password" required disabled>
+            </div>
+            <div class="form-row">
+              <label for="confirm_new_password">Підтвердження нового паролю</label>
+              <input id="confirm_new_password" name="confirm_new_password" type="password" required disabled>
+            </div>
+          </div>
+          <div class="row-inline" style="justify-content:flex-end">
+            <button type="button" class="btn btn-secondary" id="pwdEditBtn">Редагувати</button>
+            <button type="button" class="btn btn-outline" id="pwdCancelBtn" style="display:none">Скасувати</button>
+            <button type="submit" id="pwdSaveBtn" style="display:none">Зберегти</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="section-title">Видалення акаунта</div>
+        <p class="section-sub">Цю дію неможливо скасувати. Для підтвердження введіть <strong>DELETE</strong> і натисніть кнопку нижче.</p>
         <form action="{{ url_for('delete_account') }}" method="post" class="form">
           <div class="form-row">
             <label for="confirm_text">Підтвердити видалення</label>
@@ -98,23 +111,70 @@
       </section>
     </main>
 
-    <script>
-      (function(){
-        const widget = document.getElementById('accountWidget');
-        const trigger = document.getElementById('accountTrigger');
-        const menu = document.getElementById('accountMenu');
-        if(!widget || !trigger || !menu) return;
+    
+  </body>
+  <script>
+    (function(){
+      const widget = document.getElementById('accountWidget');
+      const trigger = document.getElementById('accountTrigger');
+      const menu = document.getElementById('accountMenu');
+      if(widget && trigger && menu){
         function close(){ widget.classList.remove('open'); }
-        function open(){ widget.classList.add('open'); }
-        trigger.addEventListener('click', function(e){
-          e.stopPropagation();
-          if(widget.classList.contains('open')){ close(); } else { open(); }
-        });
+        trigger.addEventListener('click', function(e){ e.stopPropagation(); widget.classList.toggle('open'); });
         document.addEventListener('click', function(){ close(); });
         menu.addEventListener('click', function(e){ e.stopPropagation(); });
-      })();
-    </script>
-  </body>
+      }
+
+      const editBtn = document.getElementById('editBtn');
+      const cancelBtn = document.getElementById('cancelBtn');
+      const saveBtn = document.getElementById('saveBtn');
+      const firstInput = document.getElementById('first_name');
+      const lastInput = document.getElementById('last_name');
+      const original = { first: firstInput.value, last: lastInput.value };
+
+      function setEditing(on){
+        firstInput.disabled = !on;
+        lastInput.disabled = !on;
+        editBtn.style.display = on ? 'none' : '';
+        cancelBtn.style.display = on ? '' : 'none';
+        saveBtn.style.display = on ? '' : 'none';
+        if(on){ firstInput.focus(); }
+      }
+
+      if(editBtn && cancelBtn && saveBtn){
+        editBtn.addEventListener('click', function(){ setEditing(true); });
+        cancelBtn.addEventListener('click', function(){
+          firstInput.value = original.first;
+          lastInput.value = original.last;
+          setEditing(false);
+        });
+      }
+
+      // Пароль: редагувати/скасувати/зберегти
+      const pwdEditBtn = document.getElementById('pwdEditBtn');
+      const pwdCancelBtn = document.getElementById('pwdCancelBtn');
+      const pwdSaveBtn = document.getElementById('pwdSaveBtn');
+      const oldPwd = document.getElementById('old_password');
+      const newPwd = document.getElementById('new_password');
+      const confPwd = document.getElementById('confirm_new_password');
+      function setPwdEditing(on){
+        [oldPwd,newPwd,confPwd].forEach(function(el){ if(el) el.disabled = !on; });
+        pwdEditBtn.style.display = on ? 'none' : '';
+        pwdCancelBtn.style.display = on ? '' : 'none';
+        pwdSaveBtn.style.display = on ? '' : 'none';
+        if(on && oldPwd){ oldPwd.focus(); }
+      }
+      if(pwdEditBtn && pwdCancelBtn && pwdSaveBtn){
+        pwdEditBtn.addEventListener('click', function(){ setPwdEditing(true); });
+        pwdCancelBtn.addEventListener('click', function(){
+          if(oldPwd) oldPwd.value = '';
+          if(newPwd) newPwd.value = '';
+          if(confPwd) confPwd.value = '';
+          setPwdEditing(false);
+        });
+      }
+    })();
+  </script>
   </html>
 
 

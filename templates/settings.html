@@ -50,20 +50,29 @@
         {% endif %}
       {% endwith %}
 
-      <section class="form-section">
+      <section class="card">
+        <div class="section-title">Загальні</div>
         <form action="{{ url_for('settings') }}" method="post" class="form">
-          <div class="form-row">
-            <label for="theme">Тема</label>
-            <select id="theme" name="theme">
-              <option value="light" {% if prefs.theme == 'light' %}selected{% endif %}>Світла</option>
-              <option value="dark" {% if prefs.theme == 'dark' %}selected{% endif %}>Темна</option>
-            </select>
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="theme">Тема</label>
+              <select id="theme" name="theme">
+                <option value="light" {% if prefs.theme == 'light' %}selected{% endif %}>Світла</option>
+                <option value="dark" {% if prefs.theme == 'dark' %}selected{% endif %}>Темна</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label for="email_notifications">Email-сповіщення</label>
+              <div class="row-inline">
+                <label class="switch">
+                  <input id="email_notifications" name="email_notifications" type="checkbox" {% if prefs.email_notifications %}checked{% endif %}>
+                  <span class="slider"></span>
+                </label>
+                <span class="muted">Увімкнути/вимкнути</span>
+              </div>
+            </div>
           </div>
-          <div class="form-row">
-            <label for="email_notifications">Email-сповіщення</label>
-            <input id="email_notifications" name="email_notifications" type="checkbox" {% if prefs.email_notifications %}checked{% endif %}>
-          </div>
-          <div class="form-actions">
+          <div class="form-actions" style="justify-content:flex-end">
             <button type="submit">Зберегти</button>
           </div>
         </form>

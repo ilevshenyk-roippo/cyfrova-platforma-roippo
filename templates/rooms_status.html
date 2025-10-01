@@ -3,20 +3,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Електронний розклад — Цифрова платформа РОІППО</title>
+    <title>Стан авдиторій — Цифрова платформа РОІППО</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   </head>
   <body>
     <div class="navbar-wrap">
       <nav class="navbar">
         <div class="nav">
-          <a class="logo" href="{{ url_for('index') }}" aria-label="Логотип">
+          <a class="logo" href="{{ url_for('home') }}" aria-label="Логотип">
             <span class="logo-badge" aria-hidden="true"></span>
             <span class="logo-text">РОІППО</span>
           </a>
           <div class="nav-links">
+            <a class="nav-link" href="{{ url_for('home') }}">Головна</a>
             <a class="nav-link" href="{{ url_for('index') }}">Бронювання авдиторій</a>
-            <a class="nav-link active" href="{{ url_for('schedule') }}">Електронний розклад</a>
+            <a class="nav-link active" href="{{ url_for('rooms_status') }}">Стан авдиторій</a>
+            <a class="nav-link" href="{{ url_for('schedule') }}">Електронний розклад</a>
           </div>
         </div>
         <div class="nav-right">
@@ -45,29 +47,30 @@
     </div>
 
     <main class="container">
-      <h1>Електронний розклад</h1>
+      <h1>Стан авдиторій</h1>
       <section class="hero">
         <h2>Модуль у розробці</h2>
-        <p class="muted">Скоро тут з’явиться зручний перегляд та керування розкладом.</p>
+        <p class="muted">Тут буде моніторинг зайнятості авдиторій у реальному часі.</p>
       </section>
     </main>
+
+    <script>
+      (function(){
+        const widget = document.getElementById('accountWidget');
+        const trigger = document.getElementById('accountTrigger');
+        const menu = document.getElementById('accountMenu');
+        if(!widget || !trigger || !menu) return;
+        function close(){ widget.classList.remove('open'); }
+        function open(){ widget.classList.add('open'); }
+        trigger.addEventListener('click', function(e){
+          e.stopPropagation();
+          if(widget.classList.contains('open')){ close(); } else { open(); }
+        });
+        document.addEventListener('click', function(){ close(); });
+        menu.addEventListener('click', function(e){ e.stopPropagation(); });
+      })();
+    </script>
   </body>
-  <script>
-    (function(){
-      const widget = document.getElementById('accountWidget');
-      const trigger = document.getElementById('accountTrigger');
-      const menu = document.getElementById('accountMenu');
-      if(!widget || !trigger || !menu) return;
-      function close(){ widget.classList.remove('open'); }
-      function open(){ widget.classList.add('open'); }
-      trigger.addEventListener('click', function(e){
-        e.stopPropagation();
-        if(widget.classList.contains('open')){ close(); } else { open(); }
-      });
-      document.addEventListener('click', function(){ close(); });
-      menu.addEventListener('click', function(e){ e.stopPropagation(); });
-    })();
-  </script>
   </html>
 
 
