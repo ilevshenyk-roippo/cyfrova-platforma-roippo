@@ -1,12 +1,10 @@
-# app.py
-import streamlit as st
-from supabase import create_client, Client
+import os
+from supabase import create_client
 
-# Вставляємо ваші дані
-SUPABASE_URL = "https://ecnzxejyssbakotctyqn.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjbnp4ZWp5c3NiYWtvdGN0eXFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzMTU5MTIsImV4cCI6MjA3NDg5MTkxMn0.dhsy_aaLzVWDsRiWXH7zEFi8JSSCcQcowsIiVoiRLKY"
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 st.title("Бронювання аудиторій")
 
@@ -27,3 +25,12 @@ with st.form("reservation_form"):
             st.success("Аудиторія успішно заброньована!")
         else:
             st.error(f"Сталася помилка: {response.data}")
+
+# Вивід всіх бронювань
+st.subheader("Всі бронювання")
+reservations = supabase.table("reservations").select("*").execute()
+if reservations.data:
+    for r in reservations.data:
+        st.write(f"Аудиторія: {r['auditoriya']}, Дата: {r['date']}")
+else:
+    st.write("Немає бронювань")
