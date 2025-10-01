@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Бронювання аудиторій</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="container">
+      <h1>Бронювання аудиторій</h1>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash">
+            {% for category, message in messages %}
+              <div class="flash-item {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% if error_message %}
+        <div class="flash-item error">{{ error_message }}</div>
+      {% endif %}
+
+      <section class="form-section">
+        <form action="{{ url_for('reserve') }}" method="post" class="form">
+          <div class="form-row">
+            <label for="auditoriya">Номер аудиторії</label>
+            <input id="auditoriya" name="auditoriya" type="text" required>
+          </div>
+          <div class="form-row">
+            <label for="date">Дата</label>
+            <input id="date" name="date" type="date" required>
+          </div>
+          <div class="form-actions">
+            <button type="submit">Забронювати</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="list-section">
+        <h2>Всі бронювання</h2>
+        {% if reservations and reservations|length > 0 %}
+          <ul class="reservations">
+            {% for r in reservations %}
+              <li>
+                <span>Аудиторія: <strong>{{ r["auditoriya"] }}</strong></span>
+                <span>Дата: <strong>{{ r["date"] }}</strong></span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>Немає бронювань</p>
+        {% endif %}
+      </section>
+    </main>
+  </body>
+  </html>
+
+
