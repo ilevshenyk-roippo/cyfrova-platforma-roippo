@@ -2,7 +2,7 @@ import os
 import json
 from datetime import date as date_type
 
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import requests
 
 try:
@@ -31,6 +31,31 @@ def get_supabase_url() -> str:
     return os.getenv("SUPABASE_URL", "").rstrip("/")
 
 
+def get_auth_url() -> str:
+    base = get_supabase_url()
+    return f"{base}/auth/v1"
+
+
+def get_rest_url() -> str:
+    base = get_supabase_url()
+    return f"{base}/rest/v1"
+
+
+def is_logged_in() -> bool:
+    return bool(session.get("access_token") and session.get("user"))
+
+
+def current_user() -> dict:
+    return session.get("user") or {}
+
+
+def require_login():
+    if not is_logged_in():
+        flash("Потрібен вхід до системи.", "error")
+        return False
+    return True
+
+
 @app.route("/", methods=["GET"])  # Головна сторінка зі списком і формою
 def index():
     supabase_url = get_supabase_url()
@@ -44,21 +69,31 @@ def index():
         )
 
     try:
-        response = requests.get(f"{supabase_url}/rest/v1/reservations", headers=headers, timeout=20)
+        response = requests.get(f"{get_rest_url()}/reservations", headers=headers, timeout=20)
         if response.status_code == 200:
             reservations = response.json()
-            return render_template("index.html", reservations=reservations, error_message=None)
+            return render_template(
+                "index.html",
+                reservations=reservations,
+                error_message=None,
+                logged_in=is_logged_in(),
+                user=current_user(),
+            )
         else:
             return render_template(
                 "index.html",
                 reservations=[],
                 error_message=f"Не вдалося завантажити бронювання: {response.text}",
+                logged_in=is_logged_in(),
+                user=current_user(),
             )
     except requests.RequestException as exc:
         return render_template(
             "index.html",
             reservations=[],
             error_message=f"Помилка з'єднання з Supabase: {exc}",
+            logged_in=is_logged_in(),
+            user=current_user(),
         )
 
 
@@ -69,6 +104,9 @@ def reserve():
 
     auditoriya = request.form.get("auditoriya", "").strip()
     date_str = request.form.get("date", "").strip()
+
+    if not require_login():
+        return redirect(url_for("index"))
 
     if not supabase_url or not headers.get("apikey"):
         flash("SUPABASE_URL або SUPABASE_KEY не налаштовано.", "error")
@@ -86,11 +124,13 @@ def reserve():
         flash("Невірний формат дати. Використовуйте YYYY-MM-DD.", "error")
         return redirect(url_for("index"))
 
-    payload = {"auditoriya": auditoriya, "date": date_str}
+    # Прив'язуємо бронювання до користувача
+    user = current_user()
+    payload = {"auditoriya": auditoriya, "date": date_str, "user_id": user.get("id")}
 
     try:
         response = requests.post(
-            f"{supabase_url}/rest/v1/reservations",
+            f"{get_rest_url()}/reservations",
             headers=headers,
             data=json.dumps(payload),
             timeout=20,
@@ -102,6 +142,81 @@ def reserve():
     except requests.RequestException as exc:
         flash(f"Помилка з'єднання з Supabase: {exc}", "error")
 
+    return redirect(url_for("index"))
+
+
+@app.route("/login", methods=["GET", "POST"])  # Логін через email+password
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+
+    email = request.form.get("email", "").strip()
+    password = request.form.get("password", "").strip()
+    if not email or not password:
+        flash("Вкажіть email і пароль.", "error")
+        return redirect(url_for("login"))
+
+    try:
+        url = f"{get_auth_url()}/token?grant_type=password"
+        headers = {
+            "apikey": os.getenv("SUPABASE_KEY", ""),
+            "Content-Type": "application/json",
+        }
+        payload = {"email": email, "password": password}
+        resp = requests.post(url, headers=headers, data=json.dumps(payload), timeout=20)
+        if resp.status_code == 200:
+            data = resp.json()
+            # Збереження токена та інформації про користувача
+            session["access_token"] = data.get("access_token")
+            session["refresh_token"] = data.get("refresh_token")
+            session["user"] = {
+                "id": data.get("user", {}).get("id"),
+                "email": data.get("user", {}).get("email"),
+            }
+            flash("Вхід виконано.", "success")
+            return redirect(url_for("index"))
+        else:
+            flash(f"Помилка входу: {resp.text}", "error")
+            return redirect(url_for("login"))
+    except requests.RequestException as exc:
+        flash(f"Помилка з'єднання: {exc}", "error")
+        return redirect(url_for("login"))
+
+
+@app.route("/register", methods=["GET", "POST"])  # Реєстрація користувача
+def register():
+    if request.method == "GET":
+        return render_template("register.html")
+
+    email = request.form.get("email", "").strip()
+    password = request.form.get("password", "").strip()
+    if not email or not password:
+        flash("Вкажіть email і пароль.", "error")
+        return redirect(url_for("register"))
+
+    try:
+        url = f"{get_auth_url()}/signup"
+        headers = {
+            "apikey": os.getenv("SUPABASE_KEY", ""),
+            "Content-Type": "application/json",
+        }
+        payload = {"email": email, "password": password}
+        resp = requests.post(url, headers=headers, data=json.dumps(payload), timeout=20)
+        if resp.status_code in (200, 201):
+            flash("Реєстрація успішна. Увійдіть за допомогою ваших даних.", "success")
+            return redirect(url_for("login"))
+        else:
+            flash(f"Помилка реєстрації: {resp.text}", "error")
+            return redirect(url_for("register"))
+    except requests.RequestException as exc:
+        flash(f"Помилка з'єднання: {exc}", "error")
+        return redirect(url_for("register"))
+
+
+@app.route("/logout", methods=["POST"])  # Вихід (очистка сесії)
+def logout():
+    session.clear()
+    flash("Вихід виконано.", "success")
     return redirect(url_for("index"))
 
 

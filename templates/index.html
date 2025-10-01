@@ -9,6 +9,17 @@
   <body>
     <main class="container">
       <h1>Бронювання аудиторій</h1>
+      <div class="auth-bar" style="margin-bottom:12px; display:flex; gap:12px; align-items:center;">
+        {% if logged_in %}
+          <span>Ви увійшли як: <strong>{{ user.email }}</strong></span>
+          <form action="{{ url_for('logout') }}" method="post" style="margin:0;">
+            <button type="submit">Вийти</button>
+          </form>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn">Увійти</a>
+          <a href="{{ url_for('register') }}" class="btn">Зареєструватись</a>
+        {% endif %}
+      </div>
 
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
