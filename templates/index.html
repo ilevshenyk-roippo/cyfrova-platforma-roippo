@@ -3,23 +3,20 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Бронювання аудиторій</title>
+    <title>Цифрова платформа РОІППО</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   </head>
   <body>
     <main class="container">
-      <h1>Бронювання аудиторій</h1>
-      <div class="auth-bar" style="margin-bottom:12px; display:flex; gap:12px; align-items:center;">
-        {% if logged_in %}
+      <h1>Цифрова платформа РОІППО</h1>
+      {% if logged_in %}
+        <div class="auth-bar">
           <span>Ви увійшли як: <strong>{{ user.email }}</strong></span>
-          <form action="{{ url_for('logout') }}" method="post" style="margin:0;">
-            <button type="submit">Вийти</button>
+          <form action="{{ url_for('logout') }}" method="post" class="inline-form">
+            <button type="submit" class="btn btn-secondary">Вийти</button>
           </form>
-        {% else %}
-          <a href="{{ url_for('login') }}" class="btn">Увійти</a>
-          <a href="{{ url_for('register') }}" class="btn">Зареєструватись</a>
-        {% endif %}
-      </div>
+        </div>
+      {% endif %}
 
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -35,37 +32,48 @@
         <div class="flash-item error">{{ error_message }}</div>
       {% endif %}
 
-      <section class="form-section">
-        <form action="{{ url_for('reserve') }}" method="post" class="form">
-          <div class="form-row">
-            <label for="auditoriya">Номер аудиторії</label>
-            <input id="auditoriya" name="auditoriya" type="text" required>
+      {% if not logged_in %}
+        <section class="hero">
+          <h2>Ласкаво просимо до Цифрової платформи РОІППО</h2>
+          <p class="muted">Увійдіть або зареєструйтесь, щоб користуватися сервісами платформи та отримати доступ до функцій для викладачів і адміністрації.</p>
+          <div class="cta">
+            <a href="{{ url_for('login') }}" class="btn btn-primary">Увійти</a>
+            <a href="{{ url_for('register') }}" class="btn btn-outline">Зареєструватись</a>
           </div>
-          <div class="form-row">
-            <label for="date">Дата</label>
-            <input id="date" name="date" type="date" required>
-          </div>
-          <div class="form-actions">
-            <button type="submit">Забронювати</button>
-          </div>
-        </form>
-      </section>
+        </section>
+      {% else %}
+        <section class="form-section">
+          <form action="{{ url_for('reserve') }}" method="post" class="form">
+            <div class="form-row">
+              <label for="auditoriya">Номер аудиторії</label>
+              <input id="auditoriya" name="auditoriya" type="text" required>
+            </div>
+            <div class="form-row">
+              <label for="date">Дата</label>
+              <input id="date" name="date" type="date" required>
+            </div>
+            <div class="form-actions">
+              <button type="submit">Забронювати</button>
+            </div>
+          </form>
+        </section>
 
-      <section class="list-section">
-        <h2>Всі бронювання</h2>
-        {% if reservations and reservations|length > 0 %}
-          <ul class="reservations">
-            {% for r in reservations %}
-              <li>
-                <span>Аудиторія: <strong>{{ r["auditoriya"] }}</strong></span>
-                <span>Дата: <strong>{{ r["date"] }}</strong></span>
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p>Немає бронювань</p>
-        {% endif %}
-      </section>
+        <section class="list-section">
+          <h2>Всі бронювання</h2>
+          {% if reservations and reservations|length > 0 %}
+            <ul class="reservations">
+              {% for r in reservations %}
+                <li>
+                  <span>Аудиторія: <strong>{{ r["auditoriya"] }}</strong></span>
+                  <span>Дата: <strong>{{ r["date"] }}</strong></span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>Немає бронювань</p>
+          {% endif %}
+        </section>
+      {% endif %}
     </main>
   </body>
   </html>

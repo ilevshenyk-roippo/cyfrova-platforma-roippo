@@ -66,6 +66,18 @@ def index():
             "index.html",
             reservations=[],
             error_message="SUPABASE_URL або SUPABASE_KEY не налаштовано у змінних оточення.",
+            logged_in=is_logged_in(),
+            user=current_user(),
+        )
+
+    # Якщо користувач не увійшов — не звертаємось до Supabase і показуємо заглушку
+    if not is_logged_in():
+        return render_template(
+            "index.html",
+            reservations=[],
+            error_message=None,
+            logged_in=False,
+            user={},
         )
 
     try:
@@ -76,7 +88,7 @@ def index():
                 "index.html",
                 reservations=reservations,
                 error_message=None,
-                logged_in=is_logged_in(),
+                logged_in=True,
                 user=current_user(),
             )
         else:
@@ -84,7 +96,7 @@ def index():
                 "index.html",
                 reservations=[],
                 error_message=f"Не вдалося завантажити бронювання: {response.text}",
-                logged_in=is_logged_in(),
+                logged_in=True,
                 user=current_user(),
             )
     except requests.RequestException as exc:
@@ -92,7 +104,7 @@ def index():
             "index.html",
             reservations=[],
             error_message=f"Помилка з'єднання з Supabase: {exc}",
-            logged_in=is_logged_in(),
+            logged_in=True,
             user=current_user(),
         )
 

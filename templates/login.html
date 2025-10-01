@@ -8,7 +8,14 @@
   </head>
   <body>
     <main class="container">
-      <h1>Вхід</h1>
+      <div class="page-title">
+        <a class="back-link" href="{{ url_for('index') }}" aria-label="Назад на головну">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <h1 style="margin:0">Вхід</h1>
+      </div>
 
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -30,8 +37,8 @@
             <label for="password">Пароль</label>
             <input id="password" name="password" type="password" required>
           </div>
-          <div class="form-actions">
-            <button type="submit">Увійти</button>
+          <div class="form-actions center">
+            <button type="submit" class="btn btn-primary btn-lg btn-block btn-primary-gradient">Увійти</button>
           </div>
         </form>
         <p>Немає акаунту? <a href="{{ url_for('register') }}">Зареєструватись</a></p>
